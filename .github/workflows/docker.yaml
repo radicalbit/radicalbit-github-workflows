@@ -21,6 +21,11 @@ on:
         required: false
         type: 'string'
         default: '.'
+      dockerfile:
+        description: 'Dockerfile path'
+        required: false
+        type: 'string'
+        default: 'Dockerfile'
     secrets:
       USERNAME:
         description: 'Registry username'
@@ -57,5 +62,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ inputs.context }}
+          file: ${{ inputs.context }}/${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
           tags: ${{ secrets.ORGANIZATION }}/${{ inputs.image }}:${{ inputs.tag }}
