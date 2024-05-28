@@ -1,6 +1,12 @@
 name: "Lint PR"
 
-on:  workflow_call
+on: 
+  workflow_call:
+    inputs:
+      github_token:
+        type: string
+        description: "GitHub Token for authentication"
+        required: true
 
 permissions:
   pull-requests: write
@@ -8,10 +14,11 @@ permissions:
 jobs:
   main:
     name: Validate PR title
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - name: Use semantic pull request action
+        uses: amannn/action-semantic-pull-request@v5
         with:
           wip: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ inputs.github_token }}
