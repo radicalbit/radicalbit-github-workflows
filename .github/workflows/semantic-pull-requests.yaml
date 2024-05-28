@@ -3,8 +3,8 @@ name: "Lint PR"
 on: 
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
-        description: "GitHub Token for authentication"
+      GIT_HUB_PAT:
+        description: "GitHub Personal Access Token for authentication"
         required: true
 
 permissions:
@@ -20,4 +20,4 @@ jobs:
         with:
           wip: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_PAT }}
