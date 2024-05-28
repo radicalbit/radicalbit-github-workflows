@@ -2,9 +2,8 @@ name: "Lint PR"
 
 on: 
   workflow_call:
-    inputs:
-      github_token:
-        type: string
+    secrets:
+      GITHUB_TOKEN:
         description: "GitHub Token for authentication"
         required: true
 
@@ -21,4 +20,4 @@ jobs:
         with:
           wip: true
         env:
-          GITHUB_TOKEN: ${{ inputs.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
