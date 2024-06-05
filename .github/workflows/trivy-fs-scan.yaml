@@ -6,9 +6,15 @@ on:
       github_token:
         description: 'GitHub Token'
         required: true
+        type: 'string'
       skip_dirs:
         description: 'A comma separated list of folders to ignore'
         required: false
+        type: 'string'
+      directory:
+        description: "Directory to scan"
+        required: true
+        type: 'string'
       prcomment:
         description: "Enable comment on PR"
         required: false
@@ -37,6 +43,9 @@ jobs:
   run-scan:
     name: Run Trivy vulnerability scanner
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,6 +54,7 @@ jobs:
         run: curl -o trivy-pr-comment.tpl ${{ inputs.template }}
 
       - name: Run Trivy vulnerability scanner
+        id: scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: 'fs'
@@ -56,7 +66,7 @@ jobs:
           exit-code: ${{ inputs.prcomment && '1' || '0' }}
 
       - name: Report vulnerabilities in PR
-        if: ${{ inputs.prcomment }} && failure() && steps.scan.outcome == 'failure'
+        if: ${{ inputs.prcomment && failure() && steps.scan.outcome == 'failure' }}
         env:
           GITHUB_TOKEN: ${{ inputs.github_token }}
         shell: bash
@@ -71,7 +81,7 @@ jobs:
             -d @result.json
 
       - name: Report no vulnerabilities in PR
-        if: ${{ inputs.prcomment }} && success() && steps.scan.outcome == 'success'
+        if: ${{ inputs.prcomment && success() && steps.scan.outcome == 'success' }}
         env:
           GITHUB_TOKEN: ${{ inputs.github_token }}
         shell: bash
