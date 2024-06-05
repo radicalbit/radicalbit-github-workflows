@@ -40,9 +40,16 @@ permissions:
 jobs:
   name: run-scan
   runs-on: ubuntu-22.04
+  defaults:
+    run:
+      working-directory: ${{ inputs.directory }}
   steps:
   - name: Checkout code
     uses: actions/checkout@v4
+  - name: Obtain template file
+    shell: bash
+    run: curl -o trivy-pr-comment.tpl ${{ inputs.template }}
+
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@0.20.0
     with:
