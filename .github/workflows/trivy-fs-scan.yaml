@@ -3,10 +3,6 @@ name: "Run TRIVY scan"
 on:
   workflow_call:
     inputs:
-      github_token:
-        description: 'GitHub Token'
-        required: true
-        type: 'string'
       skip_dirs:
         description: 'A comma separated list of folders to ignore'
         required: false
@@ -35,6 +31,9 @@ on:
         required: false
         type: 'string'
         default: 'CRITICAL,HIGH'
+    secrets:
+      GITHUB_TOKEN:
+        required: true
 
 permissions:
   pull-requests: write
@@ -68,7 +67,7 @@ jobs:
       - name: Report vulnerabilities in PR
         if: ${{ inputs.prcomment && failure() && steps.scan.outcome == 'failure' }}
         env:
-          GITHUB_TOKEN: ${{ inputs.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           echo -n "{\"body\":\"### Vulnerabilities detected\nThe following vulnerabilities of ${{ inputs.severity }} severity has been detected in the code. Please resolve these before merging the pull request.\n\n" > result.json
@@ -83,7 +82,7 @@ jobs:
       - name: Report no vulnerabilities in PR
         if: ${{ inputs.prcomment && success() && steps.scan.outcome == 'success' }}
         env:
-          GITHUB_TOKEN: ${{ inputs.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           echo -n "{\"body\":\"### No vulnerabilities detected\nNo vulnerabilities of HIGH or CRITICAL severity has been detected in the code.\"}" > result.json
