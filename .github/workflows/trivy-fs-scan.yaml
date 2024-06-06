@@ -32,7 +32,7 @@ on:
         type: 'string'
         default: 'CRITICAL,HIGH'
     secrets:
-      GITHUB_TOKEN:
+      GIT_HUB_PAT:
         required: true
 
 permissions:
@@ -67,7 +67,7 @@ jobs:
       - name: Report vulnerabilities in PR
         if: ${{ inputs.prcomment && failure() && steps.scan.outcome == 'failure' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_PAT }}
         shell: bash
         run: |
           echo -n "{\"body\":\"### Vulnerabilities detected\nThe following vulnerabilities of ${{ inputs.severity }} severity has been detected in the code. Please resolve these before merging the pull request.\n\n" > result.json
@@ -82,7 +82,7 @@ jobs:
       - name: Report no vulnerabilities in PR
         if: ${{ inputs.prcomment && success() && steps.scan.outcome == 'success' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_PAT }}
         shell: bash
         run: |
           echo -n "{\"body\":\"### No vulnerabilities detected\nNo vulnerabilities of HIGH or CRITICAL severity has been detected in the code.\"}" > result.json
