@@ -59,7 +59,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'template'
-          template: '@trivy-pr-comment.tpl'
+          template: 'trivy-pr-comment.tpl'
           output: 'trivy.json'
           severity: ${{ inputs.severity }}
           skip-dirs: ${{ inputs.skip_dirs }}
