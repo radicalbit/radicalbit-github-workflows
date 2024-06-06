@@ -1,0 +1,94 @@
+name: "Run TRIVY scan"
+
+on:
+  workflow_call:
+    inputs:
+      github_token:
+        description: 'GitHub Token'
+        required: true
+        type: 'string'
+      skip_dirs:
+        description: 'A comma separated list of folders to ignore'
+        required: false
+        type: 'string'
+      directory:
+        description: "Directory to scan"
+        required: true
+        type: 'string'
+      prcomment:
+        description: "Enable comment on PR"
+        required: false
+        type: 'boolean'
+        default: false
+      github_pr_url:
+        description: "GitHub PR URL"
+        required: false
+        type: 'string'
+        default: ''
+      template:
+        description: "url to comment template"
+        required: false
+        type: 'string'
+        default: 'https://raw.githubusercontent.com/domstolene/trivy-pr-report/main/trivy-pr-comment.tpl'
+      severity:
+        description: "Trivy severity (CSV values: MEDIUM,HIGH,CRITICAL)"
+        required: false
+        type: 'string'
+        default: 'CRITICAL,HIGH'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  run-scan:
+    name: Run Trivy vulnerability scanner
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Obtain template file
+        shell: bash
+        run: curl -o trivy-pr-comment.tpl ${{ inputs.template }}
+
+      - name: Run Trivy vulnerability scanner
+        id: scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'template'
+          output: 'trivy.json'
+          severity: ${{ inputs.severity }}
+          skip-dirs: ${{ inputs.skip_dirs }}
+          exit-code: ${{ inputs.prcomment && '1' || '0' }}
+
+      - name: Report vulnerabilities in PR
+        if: ${{ inputs.prcomment && failure() && steps.scan.outcome == 'failure' }}
+        env:
+          GITHUB_TOKEN: ${{ inputs.github_token }}
+        shell: bash
+        run: |
+          echo -n "{\"body\":\"### Vulnerabilities detected\nThe following vulnerabilities of ${{ inputs.severity }} severity has been detected in the code. Please resolve these before merging the pull request.\n\n" > result.json
+          cat trivy.json | sort | uniq | tr -d '\n' >> result.json
+          echo "\"}" >> result.json
+          curl -X POST -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            ${{ inputs.github_pr_url }} \
+            -d @result.json
+
+      - name: Report no vulnerabilities in PR
+        if: ${{ inputs.prcomment && success() && steps.scan.outcome == 'success' }}
+        env:
+          GITHUB_TOKEN: ${{ inputs.github_token }}
+        shell: bash
+        run: |
+          echo -n "{\"body\":\"### No vulnerabilities detected\nNo vulnerabilities of HIGH or CRITICAL severity has been detected in the code.\"}" > result.json
+          curl -X POST -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            ${{ inputs.github_pr_url }} \
+            -d @result.json
