@@ -35,9 +35,6 @@ on:
       GIT_HUB_PAT:
         required: true
 
-permissions:
-  pull-requests: write
-
 jobs:
   run-scan:
     name: Run Trivy vulnerability scanner
