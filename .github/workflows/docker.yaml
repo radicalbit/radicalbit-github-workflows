@@ -21,6 +21,11 @@ on:
         required: false
         type: 'string'
         default: '.'
+      multiplatform:
+        description: 'Build for multiple platforms'
+        required: false
+        default: false
+        type: 'boolean'
       dockerfile:
         description: 'Dockerfile path'
         required: false
@@ -65,4 +70,4 @@ jobs:
           file: ${{ inputs.context }}/${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
           tags: ${{ secrets.ORGANIZATION }}/${{ inputs.image }}:${{ inputs.tag }}
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ inputs.multiplatform && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
