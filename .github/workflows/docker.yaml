@@ -26,6 +26,16 @@ on:
         required: false
         type: 'string'
         default: 'Dockerfile'
+      dockerhub_shortdesc:
+        description: 'Short description for DockerHub repository'
+        required: false
+        type: 'string'
+        default: 'Radicalbit AI Monitoring'
+      dockerhub_enable_url_completion:
+        description: 'Whether we should enable completion of relative URLs to absolute ones'
+        required: false
+        type: 'boolean'
+        default: true
     secrets:
       USERNAME:
         description: 'Registry username'
@@ -66,3 +76,12 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ secrets.ORGANIZATION }}/${{ inputs.image }}:${{ inputs.tag }}
           platforms: linux/amd64,linux/arm64
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          repository: ${{ secrets.ORGANIZATION }}/${{ inputs.image }}
+          short-description: ${{ inputs.dockerhub_shortdesc }}
+          enable-url-completion: ${{ inputs.dockerhub_enable_url_completion }}
