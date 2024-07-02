@@ -36,6 +36,11 @@ on:
         required: false
         type: 'boolean'
         default: true
+      dockerhub_push_latest:
+        description: 'Whether we should push a "latest" tag in addition to the provided one'
+        required: false
+        type: 'boolean'
+        default: false
     secrets:
       USERNAME:
         description: 'Registry username'
@@ -64,9 +69,18 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
 
+      - name: Set build tags
+        id: set-build-tags
+        run: |
+          tags="${{ secrets.ORGANIZATION }}/${{ inputs.image }}:${{ inputs.tag }}"
+          if [ "${{ inputs.dockerhub_push_latest }}" = "true" ]; then
+            tags="$tags,${{ secrets.ORGANIZATION }}/${{ inputs.image }}:latest"
+          fi
+          echo "tags=$tags" >> $GITHUB_ENV
+
       - name: Log
         run: |
-          echo Building: ${{ inputs.image }}:${{ inputs.tag }} image
+          echo Building tags: ${{ env.tags }}
 
       - name: Build and push image
         uses: docker/build-push-action@v5
@@ -74,7 +88,7 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.context }}/${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
-          tags: ${{ secrets.ORGANIZATION }}/${{ inputs.image }}:${{ inputs.tag }}
+          tags: ${{ env.tags }}
           platforms: linux/amd64,linux/arm64
 
       - name: Docker Hub Description
