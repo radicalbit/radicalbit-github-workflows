@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/radicalbit/radicalbit-github-workflows/compare/v1.1.0...v1.2.0) (2024-10-31)
+
+
+### Features
+
+* add multiple registries to trivy action ([#22](https://github.com/radicalbit/radicalbit-github-workflows/issues/22)) ([d9f94b9](https://github.com/radicalbit/radicalbit-github-workflows/commit/d9f94b94290db4fad997def297b5bb3bcedae410))
+
 ## [1.1.0](https://github.com/radicalbit/radicalbit-github-workflows/compare/v1.0.1...v1.1.0) (2024-07-03)
 
 
