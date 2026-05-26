@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/radicalbit/radicalbit-github-workflows/compare/v1.2.0...v1.3.0) (2026-05-26)
+
+
+### Features
+
+* start manually github action ([#26](https://github.com/radicalbit/radicalbit-github-workflows/issues/26)) ([25c0e7e](https://github.com/radicalbit/radicalbit-github-workflows/commit/25c0e7ef777e1067129b70673a5578f23c132497))
+
+
+### Bug Fixes
+
+* add readme ([#25](https://github.com/radicalbit/radicalbit-github-workflows/issues/25)) ([88cff25](https://github.com/radicalbit/radicalbit-github-workflows/commit/88cff25824c92a49a24b0b3d69c05fb0ea8f5a9b))
+
 ## [1.2.0](https://github.com/radicalbit/radicalbit-github-workflows/compare/v1.1.0...v1.2.0) (2024-10-31)
 
 
